@@ -2,7 +2,7 @@
 //		
 //       git.rev = 234
 //  git.revision = fdd4980be270473bdd7e8206afeda65ab6e4c3a4
-//         stage = ES02
+//         stage = ES03
 //
 // ***************************************************
 package MusicLandscape;
@@ -11,7 +11,7 @@ package MusicLandscape;
  * 
  * @author TeM
  * @version 234
- * @Stage ES02
+ * @Stage ES03
  * @ProgrammingProblem.Category simple entity classes
  * @ProgrammingProblem.Introduced ExerciseSheet02 (provided)
  */
@@ -85,6 +85,18 @@ public class Venue {
 	
 	/**************** ES 03 ***********************/
 
+	
+	/**
+	 * creates a copy of a venue
+	 * @param v the original venue to copied
+	 * @ProgrammingProblem.Aspect copy constructor 
+     * @ProgrammingProblem.Introduced ExerciseSheet03
+	 */
+	public Venue(Venue v){
+		if (v==null)return;
+		this.name = v.name;
+		this.capacity = v.capacity;
+	}
 	
 
 }

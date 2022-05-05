@@ -15,6 +15,14 @@ public class Event {
         setDescription("");
     }
 
+    public Event(Event e){
+        this.artist = new Artist(e.getArtist());
+        this.attendees = e.attendees;
+        this.date = new Date(e.getDate());
+        this.description = e.description;
+        this.venue = new Venue(e.getVenue());
+    }
+
     public Artist getArtist() {
         return artist;
     }
@@ -62,5 +70,48 @@ public class Event {
 
     public void setVenue(Venue venue) {
         this.venue = venue;
+    }
+
+    @Override
+    public String toString(){
+        String text = "";
+
+        if(getArtist() != null && getArtist().getName() != null){
+            text += getArtist().getName();
+        } else {
+            text += "unknown";
+        }
+
+        text += " @ ";
+
+        if(getVenue() != null && getVenue().getName() != null){
+            text += getVenue().getName();
+        } else {
+            text += "unknown";
+        }
+
+        text += " on ";
+
+        if(getDate() != null && getDate().numericString() != null){
+            text += getDate().numericString();
+        } else {
+            text += "null";
+        }
+
+        text += "\n";
+
+        if(getDescription() != null){
+            text += getDescription();
+        } else {
+            text += "unknown";
+        }
+
+        text += ("\n(" + getAttendees() + " attending (" + impact() + "))");
+
+        return text;
+    }
+
+    public int impact(){
+        return attendees*2;
     }
 }

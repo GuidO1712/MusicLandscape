@@ -23,4 +23,17 @@ public class Artist {
         if(name != null && !name.trim().equals(""))
             this.name = name;
     }
+
+    @Override
+    public String toString(){
+        String text;
+
+        if(getName() != null){
+            text = getName();
+        } else {
+            text = "unknown";
+        }
+
+        return text;
+    }
 }

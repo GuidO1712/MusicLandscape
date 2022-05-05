@@ -113,4 +113,13 @@ public class Track {
 
         return text;
     }
+
+    @Override
+    public String toString(){
+        String text = "";
+
+        text = getString();
+
+        return text;
+    }
 }

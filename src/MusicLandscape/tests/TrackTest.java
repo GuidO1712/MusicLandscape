@@ -2,7 +2,7 @@
 //		
 //       git.rev = 234
 //  git.revision = fdd4980be270473bdd7e8206afeda65ab6e4c3a4
-//         stage = ES02
+//         stage = ES03
 //
 // ***************************************************
 package MusicLandscape.tests;
@@ -23,7 +23,7 @@ import MusicLandscape.entities.*;
  * 
  * @author TeM
  * @version 234
- * @Stage ES02
+ * @Stage ES03
  *
  */
 public class TrackTest {
@@ -57,123 +57,42 @@ public class TrackTest {
 	}
 	
   
-  
-  
-  /**************** ES 02 ***********************/
-  @Test
-  public void Track() {
-    Track toTest= new Track();
-    String message="";
-	List<Object[]> myList= new ArrayList<Object[]>();
-	
-	myList.add(new Object[]{"s", "title",null});
-	myList.add(new Object[]{"i", "duration",0});
-	myList.add(new Object[]{"nn","writer","unknown"});
-	myList.add(new Object[]{"nn","performer","unknown"});
-	//myList.add(new Object[]{"i", "year",0});
-	
-	
-	for (Object[] li : myList){
-		message=String.format("initial value for %s should be %s\n",li[1], li[2]);
-		try {
-			switch (li[0].toString()) {
-			case "i":case "s":
-				assertEquals(getPrivateField(toTest, li[1].toString()).get(toTest),li[2],message);
-				break;
-			case "nn":
-				assertNotNull(getPrivateField(toTest, li[1].toString()).get(toTest),message);
-				break;
-			}
-			
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}				
-	}
-	
-	
-	//check year extra cause of wrong init values
-	int year;
-	message=String.format("initial value for year is allowed with 0 or 1900");
-	try {
-		year = (int)getPrivateField(toTest, "year").get(toTest);
-		assertEquals((year==0||year==1900),true,message);
-	} catch (IllegalArgumentException | IllegalAccessException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	
-
-    
+  @DataProvider(name = "getString")
+  private static Object[][] string() {
+      return new Object[][] { 
+    		  //title, writer, name, performer, name, dur, ret
+    		  {null, null, null, null, null, 0, "   unknown by    unknown performed by    unknown (00:00)"},
+    		  {"song", mock(Artist.class), null, mock(Artist.class), null, 123, "      song by    unknown performed by    unknown (02:03)"},
+    		  {"short song", mock(Artist.class), "writer", mock(Artist.class), "performer", 1230, "short song by     writer performed by  performer (20:30)"},
+    		  {"very long songtitle", mock(Artist.class), "long writer", mock(Artist.class), "long performer", 1230, "very long  by long write performed by long perfo (20:30)"}
+   		  };
   }
-
-	  @Test(dataProvider="copyTrack")
-	  public void TrackTrack(String title, Artist w, Artist p, int d, int y) {
-			
-		  	List<Object[]> myList= new ArrayList<Object[]>();
-			
-			//werte in copyTrack setzen
-			Track copyTrack= new Track();
-			
-			myList.add(new Object[]{"title",title});
-			myList.add(new Object[]{"duration",d});
-			myList.add(new Object[]{"writer",w});
-			myList.add(new Object[]{"performer",p});
-			myList.add(new Object[]{"year",y});
-			
-			for (Object[] li : myList){
-				try {
-					getPrivateField(copyTrack, li[0].toString()).set(copyTrack,li[1]);
-									
-				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}				
-			}
-			
-			//copy constructor aufrufen
-			toTest=new Track(copyTrack);
-			
-			//copy check
-			assertEquals(toTest.getDuration(), copyTrack.getDuration(),"copy duration failed");
-			assertEquals(toTest.getYear(), copyTrack.getYear(),"copy year failed");
-			assertEquals(toTest.getTitle(), copyTrack.getTitle(),"copy title failed");
-			assertNotEquals(toTest.getWriter(), copyTrack.getWriter(),"copy writer failed - need to copy object");
-			assertNotEquals(toTest.getPerformer(), copyTrack.getPerformer(),"copy performer failed - need to copy object");
-			
-	  }
-	  @DataProvider(name = "copyTrack")
-	  public static Object[][] copyTrack() {
-	      return new Object[][] { 
-	    		  //title, writer, performer, dur, year
-	    		  {null, mock(Artist.class), mock(Artist.class), 0, 1900},
-	    		  {"song", mock(Artist.class), mock(Artist.class), 123, 2015},
-	    		  {"short song", mock(Artist.class), mock(Artist.class), 1230, 2000},
-	    		  {"very long songtitle", mock(Artist.class), mock(Artist.class), 1230, 1890}
-	   		  };
-	  }
-  @Test(dataProvider="trackTitle")
-  public void TrackString(String title) {
-	  List<Object[]> myList= new ArrayList<Object[]>();
-		
-		//werte in copyTrack setzen
-		Track copyTrack= new Track();
+  
+  
+  
+  
+  
+  
+  
+  
+  /**************** ES 03 ***********************/
+  @Test(dataProvider="getString")
+  public void testtoString(String title, Artist w, String wName, Artist p, String pName, int d, String out) {
+		List<Object[]> myList= new ArrayList<Object[]>();
 		
 		myList.add(new Object[]{"title",title});
-		myList.add(new Object[]{"duration",0});
-		myList.add(new Object[]{"writer",mock(Artist.class)});
-		myList.add(new Object[]{"performer",mock(Artist.class)});
-		myList.add(new Object[]{"year",0});
+		myList.add(new Object[]{"duration",d});
+		myList.add(new Object[]{"writer",w});
+		myList.add(new Object[]{"performer",p});
+		
+		if (w!=null)
+			  when(w.getName()).thenReturn(wName);
+		if (p!=null)
+			  when(p.getName()).thenReturn(pName);
 		
 		for (Object[] li : myList){
 			try {
-				getPrivateField(copyTrack, li[0].toString()).set(copyTrack,li[1]);
+				getPrivateField(toTest, li[0].toString()).set(toTest,li[1]);
 								
 			} catch (IllegalArgumentException e) {
 				// TODO Auto-generated catch block
@@ -184,32 +103,10 @@ public class TrackTest {
 			}				
 		}
 		
-		//copy constructor aufrufen
-		toTest=new Track(copyTrack);
-		
-		//copy check
-		assertEquals(toTest.getDuration(), copyTrack.getDuration(),"copy duration failed");
-		assertEquals(toTest.getYear(), copyTrack.getYear(),"copy year failed");
-		assertEquals(toTest.getTitle(), copyTrack.getTitle(),"copy title failed");
-		assertNotEquals(toTest.getWriter(), copyTrack.getWriter(),"copy writer failed - need to copy object");
-		assertNotEquals(toTest.getPerformer(), copyTrack.getPerformer(),"copy performer failed - need to copy object");
-	
+		assertEquals(toTest.toString(), out);  
+	  
   }
-  
-  @DataProvider(name = "trackTitle")
-  public static Object[][] trackTitle() {
-      return new Object[][] { 
-    		  //title
-    		  {null},
-    		  {"song"},
-    		  {"short song"},
-    		  {"very long songtitle"}
-   		  };
-  }
-  
-  
-  
-  
+
   
   
     
