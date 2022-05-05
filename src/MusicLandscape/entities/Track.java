@@ -9,17 +9,28 @@ public class Track {
     private Artist performer;
     private int year;
 
-    public Track() {
-        writer = new Artist();
-        performer = new Artist();
+    public Track(){
+        setDuration(0);
+        setYear(1900);
+        setWriter(new Artist());
+        setPerformer(new Artist());
+    }
+
+    public Track(String title){
+        this();
+        setTitle(title);
+    }
+
+    public Track(Track t){
+        this.title = t.title;
+        this.performer = new Artist(t.getPerformer());
+        this.writer = new Artist(t.getWriter());
+        this.duration = t.duration;
+        this.year = t.year;
     }
 
     public String getTitle() {
-        if (title == null) {
-            return "unknown title";
-        } else {
-            return title;
-        }
+        return Objects.requireNonNullElse(title, "unknown title");
     }
 
     public void setTitle(String title) {
@@ -40,9 +51,8 @@ public class Track {
     }
 
     public void setWriter(Artist writer) {
-        if (writer != null) {
+        if (writer != null)
             this.writer = writer;
-        }
     }
 
     public Artist getPerformer() {
