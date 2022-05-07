@@ -1,8 +1,11 @@
 package MusicLandscape.entities;
 
-import java.util.Objects;
+import MusicLandscape.util.ConsoleScanable;
 
-public class Track {
+import java.util.Objects;
+import java.util.Scanner;
+
+public class Track implements ConsoleScanable {
     private String title;
     private int duration;
     private Artist writer;
@@ -121,5 +124,53 @@ public class Track {
         text = getString();
 
         return text;
+    }
+
+    @Override
+    public boolean scan() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Set values for the current track. If you do not want to change the value leave it empty.");
+        boolean changed = false;
+
+        while(true) {
+            System.out.print("Title (current value: " + getTitle() + "): ");
+            String inputTitle = scanner.nextLine();
+
+            if (!inputTitle.equals("")) {
+                if (!inputTitle.trim().isEmpty()) {
+                    setTitle(inputTitle);
+                    changed = true;
+                    break;
+                } else {
+                    System.out.println("Value for title has to be a text!");
+                }
+            } else {
+                break;
+            }
+        }
+
+        while(true) {
+            System.out.print("Duration (current value: " + getDuration() + "): ");
+            String inputDurationString = scanner.nextLine();
+
+            if(!inputDurationString.equals("")){
+                try{
+                    int inputDuration = Integer.parseInt(inputDurationString);
+                    if (inputDuration > 0) {
+                        setDuration(inputDuration);
+                        changed = true;
+                        break;
+                    } else {
+                        System.out.println("Value for duration has to be 0 or positive!");
+                    }
+                } catch (NumberFormatException e){
+                    System.out.println("Please write as an input 0, a positive number!");
+                }
+            } else {
+                break;
+            }
+        }
+
+        return changed;
     }
 }
