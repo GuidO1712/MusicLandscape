@@ -2,12 +2,25 @@ package MusicLandscape;
 
 import MusicLandscape.entities.Album;
 import MusicLandscape.entities.Track;
+import MusicLandscape.util.matcher.DurationMatcher;
 
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
+
+        /*Track t = new Track();
+        t.setDuration(120);
+        System.out.println("Duration: " + t.getDuration());
+
+        DurationMatcher dm = new DurationMatcher();
+
+        dm.setPattern("1 200");
+
+        System.out.println(dm.getPattern());
+
+        System.out.println(dm.matches(t));*/
 
         /*Track t = new Track();
         Track t1 = new Track();

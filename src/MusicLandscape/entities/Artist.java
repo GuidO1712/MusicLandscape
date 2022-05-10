@@ -1,6 +1,6 @@
 package MusicLandscape.entities;
 
-public class Artist {
+public class Artist implements Comparable<Artist>{
     private String name;
 
     public Artist(){
@@ -35,5 +35,10 @@ public class Artist {
         }
 
         return text;
+    }
+
+    @Override
+    public int compareTo(Artist arg0) {
+        return getName().compareTo(arg0.getName());
     }
 }
