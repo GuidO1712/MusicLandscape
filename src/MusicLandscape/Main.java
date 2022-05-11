@@ -1,7 +1,9 @@
 package MusicLandscape;
 
 import MusicLandscape.entities.Album;
+import MusicLandscape.entities.Artist;
 import MusicLandscape.entities.Track;
+import MusicLandscape.util.formatters.CSVTrackFormatter;
 import MusicLandscape.util.matcher.DurationMatcher;
 
 import java.util.Scanner;
@@ -9,6 +11,32 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
+        Track t = new Track();
+        CSVTrackFormatter csv = new CSVTrackFormatter();
+
+        System.out.println(csv.format(t));
+
+        t.setTitle("TEST TITLE");
+        System.out.println(csv.format(t));
+
+        t.setWriter(new Artist());
+        System.out.println(csv.format(t));
+
+        t.setWriter(new Artist("Test Artist"));
+        t.setPerformer(new Artist());
+        System.out.println(csv.format(t));
+
+        t.setPerformer(new Artist("Test Performer"));
+        t.setDuration(180);
+        System.out.println(csv.format(t));
+
+        t.setYear(2022);
+        System.out.println(csv.format(t));
+
+        System.out.println("\nCSV File: " + csv.toString());
+        System.out.println(csv.header());
+        System.out.println(csv.topSeparator());
+        System.out.println(csv.format(t));
 
         /*Track t = new Track();
         t.setDuration(120);
