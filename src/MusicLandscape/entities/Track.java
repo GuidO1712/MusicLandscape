@@ -85,6 +85,12 @@ public class Track implements ConsoleScanable {
         }
     }
 
+    public String getTrackAsOneString(){
+        String text;
+        text = (getTitle() + " " + getYear() + " " + getPerformer().getName() + " " + getWriter().getName() + " " + getDuration());
+        return text;
+    }
+
     public String getString() {
         String text = "";
 
