@@ -31,291 +31,226 @@ import MusicLandscape.util.io.MyWriter;
 import MusicLandscape.util.matcher.*;
 
 /**
- * 
  * @author TeM
  * @version ${gitrev}
  * @Stage ${stage}
- *
  */
 public class MainProvided {
 
-	private MyTrackContainer db = new MyTrackContainer();
-	private List<Comparator<Track>> comparators = new LinkedList<Comparator<Track>>();
-	private List<MyFormatter<Track>> formatters = new LinkedList<MyFormatter<Track>>();
-	private List<MyMatcher<Track>> matchers = new LinkedList<MyMatcher<Track>>();
+    private MyTrackContainer db = new MyTrackContainer();
+    private List<Comparator<Track>> comparators = new LinkedList<Comparator<Track>>();
+    private List<MyFormatter<Track>> formatters = new LinkedList<MyFormatter<Track>>();
+    private List<MyMatcher<Track>> matchers = new LinkedList<MyMatcher<Track>>();
 
-	private Comparator<Track> theComp;
-	private boolean asc = true;
+    private Comparator<Track> theComp;
+    private boolean asc = true;
 
-	private MyFormatter<Track> theFormat;
-	private MyMatcher<Track> placeboMatcher = new TitleMatcher("");
-	private Menu menu = new Menu();
+    private MyFormatter<Track> theFormat;
+    private MyMatcher<Track> placeboMatcher = new TitleMatcher("");
+    private Menu menu = new Menu();
 
-	{
+    {
 
-		comparators.add(theComp = new TitleComparator());
-		comparators.add(new DurationComparator());
-		comparators.add(new WriterComparator());
-		comparators.add(new PerformerComparator());
-		comparators.add(new YearComparator());
+        comparators.add(theComp = new TitleComparator());
+        comparators.add(new DurationComparator());
+        comparators.add(new WriterComparator());
+        comparators.add(new PerformerComparator());
+        comparators.add(new YearComparator());
 
-		matchers.add(placeboMatcher);
-		matchers.add(new DurationMatcher());
-		matchers.add(new YearMatcher());
-		matchers.add(new WriterMatcher(""));
-		matchers.add(new PerfomerMatcher(""));
-		matchers.add(new TrackMatcher(""));
+        matchers.add(placeboMatcher);
+        matchers.add(new DurationMatcher());
+        matchers.add(new YearMatcher());
+        matchers.add(new WriterMatcher(""));
+        matchers.add(new PerfomerMatcher(""));
+        matchers.add(new TrackMatcher(""));
 
-		formatters.add(theFormat = new LongTrackFormatter());
-		formatters.add(new ShortTrackFormatter());
-		formatters.add(new CSVTrackFormatter());
+        formatters.add(theFormat = new LongTrackFormatter());
+        formatters.add(new ShortTrackFormatter());
+        formatters.add(new CSVTrackFormatter());
 
-	}
+    }
 
-	private static final String WELCOME_TEXT = "Welcome to the FinalTrackDataBase";
-	private static final String GOOD_BYE_TEXT = "Thank you for using FinalTrackDataBase";
+    private static final String WELCOME_TEXT = "Welcome to the FinalTrackDataBase";
+    private static final String GOOD_BYE_TEXT = "Thank you for using FinalTrackDataBase";
 
-	private static abstract class MenuItem {
-		String text;
-		static int nextID = 0;
-		final int id = nextID++;
+    private static abstract class MenuItem {
+        String text;
+        static int nextID = 0;
+        final int id = nextID++;
 
-		abstract void execute();
+        abstract void execute();
 
-		MenuItem(String s) {
-			text = s;
-		};
+        MenuItem(String s) {
+            text = s;
+        }
 
-		public String toString() {
-			return id + "\t" + text;
-		}
-	}
+        ;
 
-	private class Menu {
+        public String toString() {
+            return id + "\t" + text;
+        }
+    }
 
-		private MenuItem[] menu = {
+    private class Menu {
 
-		new MenuItem("show menu") {
-			void execute() {
-				display();
-			}
-		// end of MenuItem
-		},
+        private MenuItem[] menu = {
 
-		new MenuItem("display selection") {
-			void execute() {
-				System.out.printf("displaying selection:\n");
+                new MenuItem("show menu") {
+                    void execute() {
+                        display();
+                    }
+                    // end of MenuItem
+                },
 
-				MainProvided.this.display(db);
-			}
-    	// end of MenuItem
-		},
+                new MenuItem("display selection") {
+                    void execute() {
+                        System.out.printf("displaying selection:\n");
 
-		new MenuItem("add") {
-			void execute() {
-				System.out.printf("add:\n");
+                        MainProvided.this.display(db);
+                    }
+                    // end of MenuItem
+                },
 
-				MainProvided.this.add();
-			}
-		// end of MenuItem
-		},
+                new MenuItem("edit") {
+                    void execute() {
+                        System.out.printf("edit:\n");
 
-		new MenuItem("edit") {
-			void execute() {
-				System.out.printf("edit:\n");
+                        MainProvided.this.edit();
+                    }
+                    // end of MenuItem
+                },
 
-				MainProvided.this.edit();
-			}
-			// end of MenuItem
-		},
+                new MenuItem("filter") {
+                    void execute() {
+                        System.out.printf("filter:\n");
 
-		new MenuItem("reset") {
-			void execute() {
-				db.reset();
-				System.out.println("selection was reseted");
-			}
-			// end of MenuItem
-		},
+                        int i = 0;
 
-		new MenuItem("remove selection") {
-			void execute() {
-				System.out.printf("edit:\n");
-				db.remove();
-			}
-			// end of MenuItem
-		},
+                        for (MyMatcher<Track> mym : matchers) {
+                            i++;
+                            System.out.println(i + "\t" + mym.toString());
+                        }
 
-		new MenuItem("filter") {
-			void execute() {
-				System.out.printf("filter:\n");
+                        Scanner sc = new Scanner(System.in);
 
-				int i = 0;
+                        System.out.print("Select filtering: ");
+                        try {
+                            int filteringIdx = Integer.parseInt(sc.nextLine());
+                            if (filteringIdx > 0 && filteringIdx <= i) {
+                                filteringIdx--; // to get the right index for the list
+                                System.out.print("Enter pattern: ");
+                                String inputPattern = sc.nextLine();
 
-				for(MyMatcher<Track> mym : matchers){
-					i++;
-					System.out.println(i + "\t" + mym.toString());
-				}
+                                matchers.get(filteringIdx).setPattern(inputPattern);
 
-				Scanner sc = new Scanner(System.in);
+                                System.out.println(matchers.get(filteringIdx).toString() + " filter applied (" + db.filter(matchers.get(filteringIdx)) + " records filtered)");
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Input for the index for filtering was not a number");
+                        }
+                    }
+                    // end of MenuItem
+                },
 
-				System.out.print("Select filtering: ");
-				try{
-					int filteringIdx = Integer.parseInt(sc.nextLine());
-					if(filteringIdx > 0 && filteringIdx <= i){
-						filteringIdx--; // to get the right index for the list
-						System.out.print("Enter pattern: ");
-						String inputPattern = sc.nextLine();
+                new MenuItem("reset") {
+                    void execute() {
+                        db.reset();
+                        System.out.println("selection was reseted");
+                    }
+                    // end of MenuItem
+                },
 
-						matchers.get(filteringIdx).setPattern(inputPattern);
+                new MenuItem("remove selection") {
+                    void execute() {
+                        System.out.printf("edit:\n");
+                        db.remove();
+                    }
+                    // end of MenuItem
+                },
 
-						System.out.println(matchers.get(filteringIdx).toString() + " filter applied (" + db.filter(matchers.get(filteringIdx)) + " records filtered)" );
-					}
-				} catch (NumberFormatException e){
-					System.out.println("Input for the index for filtering was not a number");
-				}
-			}
-			// end of MenuItem
-		},
+                new MenuItem("add") {
+                    void execute() {
+                        System.out.printf("add:\n");
 
-		new MenuItem("select formatting") {
-			void execute() {
-				System.out.printf("available formats:\n");
+                        MainProvided.this.add();
+                    }
+                    // end of MenuItem
+                },
 
-				int i = 0;
+                new MenuItem("save selection") {
+                    void execute() {
+                        try {
+                            Scanner sc = new Scanner(System.in);
+                            String fileName = sc.nextLine();
+                            FileWriter file = new FileWriter(fileName);
+                            CSVTrackFormatter csvTrackFormatter = new CSVTrackFormatter();
+                            MyWriter myWriter = new MyWriter<>(file, csvTrackFormatter);
+                            int counter = 0;
 
-				for(MyFormatter<Track> myf : formatters){
-					i++;
-					System.out.println(i + "\t" + myf.toString());
-				}
+                            if (db.selection().length > 0) {
+                                for (Track t : db.selection()) {
+                                    if (myWriter.put(t)) {
+                                        counter++;
+                                    } else {
+                                        System.out.println("Could not write track: " + csvTrackFormatter.format(t));
+                                    }
+                                }
+                            }
 
-				Scanner sc = new Scanner(System.in);
-				System.out.print("Select formatting: ");
-				try{
-					int selectedIdx = Integer.parseInt(sc.nextLine());
-					if(selectedIdx > 0 && selectedIdx <= i){
-						theFormat = formatters.get(selectedIdx-1);
-						System.out.println(theFormat.toString() + " selected");
-					}
-				} catch (NumberFormatException e){
-					System.out.println("Input for the index for formatters was not a number");
-				}
-			}
-			// end of MenuItem
-		},
+                            myWriter.close();
 
-		new MenuItem("select sorting") {
-			void execute() {
-				System.out.printf("available sorting styles:\n");
-				for(int i = 0, j = 1; i < comparators.size(); i++, j++){
-					System.out.println(j + ":\t" + comparators.get(i).toString());
-				}
+                            System.out.println(counter + " tracks written");
 
-				Scanner sc = new Scanner(System.in);
-				System.out.print("Select sorting: ");
-				try{
-					int sortingIdx = Integer.parseInt(sc.nextLine());
-					if(sortingIdx > 0 && sortingIdx <= comparators.size()){
-						theComp = comparators.get(sortingIdx-1);
-						db.sort(theComp, asc);
-						String text = "descending";
-						if(asc){
-							text = "ascending";
-						}
-						System.out.println("selection sorted " + theComp.toString() + "(" + text + ")");
-					}
-				} catch (NumberFormatException e){
-					System.out.println("Input for index for sorting was not a number");
-				}
-			}
-			// end of MenuItem
-		},
+                        } catch (IOException e) {
+                            System.out.println("Could not create new file");
+                        }
 
-		new MenuItem("reverse sorting order") {
-			void execute() {
-				asc = !asc;
-				String text = "descending";
-				if(asc){
-					text = "ascending";
-				}
-				System.out.println(theComp.toString() + " (" + text +").");
-			}
-			// end of MenuItem
-		},
+                    }
+                    // end of MenuItem
+                },
 
-		new MenuItem("save selection") {
-			void execute() {
-				try {
-					Scanner sc = new Scanner(System.in);
-					String fileName = sc.nextLine();
-					FileWriter file = new FileWriter(fileName);
-					CSVTrackFormatter csvTrackFormatter = new CSVTrackFormatter();
-					MyWriter myWriter = new MyWriter<>(file, csvTrackFormatter);
-					int counter = 0;
+                new MenuItem("load") {
+                    void execute() {
+                        int counter = 0;
 
-					if(db.selection().length > 0) {
-						for (Track t : db.selection()) {
-							if (myWriter.put(t)) {
-								counter++;
-							} else {
-								System.out.println("Could not write track: " + csvTrackFormatter.format(t));
-							}
-						}
-					}
+                        Scanner sc = new Scanner(System.in);
+                        System.out.print("Enter file name: ");
+                        String fileName = sc.nextLine();
+                        CSVTrackFormatter csvTrackFormatter = new CSVTrackFormatter();
 
-					myWriter.close();
+                        try {
+                            FileReader frLine = new FileReader(fileName);
+                            BufferedReader readerForLines = new BufferedReader(frLine);
 
-					System.out.println(counter + " tracks written");
+                            int lines = 0;
 
-				} catch (IOException e){
-					System.out.println("Could not create new file");
-				}
+                            while (readerForLines.readLine() != null) {
+                                lines++;
+                            }
 
-			}
-			// end of MenuItem
-		},
+                            readerForLines.close();
+                            frLine.close();
 
-		new MenuItem("load") {
-			void execute() {
-				int counter = 0;
+                            FileReader frData = new FileReader(fileName);
+                            BufferedReader readerForData = new BufferedReader(frData);
+                            MyTrackCSVReader myCSV = new MyTrackCSVReader(readerForData);
 
-				Scanner sc = new Scanner(System.in);
-				System.out.print("Enter file name: ");
-				String fileName = sc.nextLine();
-				CSVTrackFormatter csvTrackFormatter = new CSVTrackFormatter();
+                            Track t;
+                            for (int i = 0; i < lines; i++) {
+                                if ((t = myCSV.get()) != null) {
+                                    db.add(t);
+                                    counter++;
+                                    System.out.println(csvTrackFormatter.format(t));
+                                }
+                            }
 
-				try {
-					FileReader frLine = new FileReader(fileName);
-					BufferedReader readerForLines = new BufferedReader(frLine);
+                        } catch (FileNotFoundException e) {
+                            System.out.println("Did not find file");
+                        } catch (IOException e) {
+                            System.out.println("Could not read file");
+                        }
 
-					int lines = 0;
-
-					while(readerForLines.readLine() != null){
-						lines++;
-					}
-
-					readerForLines.close();
-					frLine.close();
-
-					FileReader frData = new FileReader(fileName);
-					BufferedReader readerForData = new BufferedReader(frData);
-					MyTrackCSVReader myCSV = new MyTrackCSVReader(readerForData);
-
-					Track t;
-					for(int i = 0; i < lines; i++){
-						if((t = myCSV.get()) != null){
-							db.add(t);
-							counter++;
-							System.out.println(csvTrackFormatter.format(t));
-						}
-					}
-
-				} catch (FileNotFoundException e) {
-					System.out.println("Did not find file");
-				} catch (IOException e) {
-					System.out.println("Could not read file");
-				}
-
-				System.out.println(counter + " tracks imported");
+                        System.out.println(counter + " tracks imported");
 
 				/*
 				//First I wrote my own reader but I realized we already coded MyTrackCSVReader
@@ -378,165 +313,228 @@ public class MainProvided {
 				} catch (NumberFormatException e){
 					System.out.println("The format of the CSV file is not valid");
 				}*/
-			}
-			// end of MenuItem
-		},
+                    }
+                    // end of MenuItem
+                },
+
+                new MenuItem("reverse sorting order") {
+                    void execute() {
+                        asc = !asc;
+                        String text = "descending";
+                        if (asc) {
+                            text = "ascending";
+                        }
+                        System.out.println(theComp.toString() + " (" + text + ").");
+                    }
+                    // end of MenuItem
+                },
+
+                new MenuItem("select sorting") {
+                    void execute() {
+                        System.out.printf("available sorting styles:\n");
+                        for (int i = 0, j = 1; i < comparators.size(); i++, j++) {
+                            System.out.println(j + ":\t" + comparators.get(i).toString());
+                        }
+
+                        Scanner sc = new Scanner(System.in);
+                        System.out.print("Select sorting: ");
+                        try {
+                            int sortingIdx = Integer.parseInt(sc.nextLine());
+                            if (sortingIdx > 0 && sortingIdx <= comparators.size()) {
+                                theComp = comparators.get(sortingIdx - 1);
+                                db.sort(theComp, asc);
+                                String text = "descending";
+                                if (asc) {
+                                    text = "ascending";
+                                }
+                                System.out.println("selection sorted " + theComp.toString() + "(" + text + ")");
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Input for index for sorting was not a number");
+                        }
+                    }
+                    // end of MenuItem
+                },
+
+                new MenuItem("select formatting") {
+                    void execute() {
+                        System.out.printf("available formats:\n");
+
+                        int i = 0;
+
+                        for (MyFormatter<Track> myf : formatters) {
+                            i++;
+                            System.out.println(i + "\t" + myf.toString());
+                        }
+
+                        Scanner sc = new Scanner(System.in);
+                        System.out.print("Select formatting: ");
+                        try {
+                            int selectedIdx = Integer.parseInt(sc.nextLine());
+                            if (selectedIdx > 0 && selectedIdx <= i) {
+                                theFormat = formatters.get(selectedIdx - 1);
+                                System.out.println(theFormat.toString() + " selected");
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Input for the index for formatters was not a number");
+                        }
+                    }
+                    // end of MenuItem
+                }
+        };// end of array
+
+        void display() {
+            for (MenuItem m : menu) {
+                System.out.println(m);
+            }
+        }
+
+        public boolean execute(int input) {
+            for (MenuItem m : menu) {
+                if (m != null && m.id == input) {
+                    m.execute();
+                    return true;
+                }
+            }
+            return false;
+
+        }
+
+    }
+
+    public void go() {
+
+        System.out.println(WELCOME_TEXT);
+        Scanner sc = new Scanner(System.in);
+        menu.execute(0);
+        while (true) {
+            try {
+                // get choice
+                System.out.print(": ");
+                int input = Integer.parseInt(sc.nextLine());
+                if (menu.execute(input))
+                    continue;
+
+                System.out.print("exit? (1=yes)");
+                if (Integer.parseInt(sc.nextLine()) == 1)
+                    break;
+            } catch (NumberFormatException e) {
+                System.out.println("Please input a number from the menu");
+            }
+        }
+
+        System.out.println(GOOD_BYE_TEXT);
+        sc.close();
+    }
+
+    public static void main(String[] args) {
+
+        new MainProvided().go();
+
+    }
+
+    public void display(MyTrackContainer db) {
+
+        if (db.size() == 0) {
+            System.out.print("no records stored.\n");
+            return;
+        }
+        if (db.selection().length == 0) {
+            System.out.print("selection empty.\n");
+            return;
+        }
+
+        System.out.println('\n' + theFormat.header());
+        System.out.println(theFormat.topSeparator());
+        for (Track tt : db.selection())
+            System.out.println(theFormat.format(tt));
+        System.out.println();
+
+        System.out.printf("%d out of %d records selected\n", db.selection().length,
+                db.size());
+    }
+
+    public void add() {
+        Track t = new Track();
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Title: ");
+
+        String inputTitle = sc.nextLine();
+
+        if (!inputTitle.trim().isEmpty()) {
+            t.setTitle(inputTitle);
+        }
+
+        System.out.print("Duration: ");
+
+        try {
+            int inputDuration = Integer.parseInt(sc.nextLine());
+            if (inputDuration >= 0) {
+                t.setDuration(inputDuration);
+            } else {
+                System.out.println("Duration was negative");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Input for duration was not a number");
+        }
+
+        System.out.print("Year: ");
+
+        try {
+            int inputYear = Integer.parseInt(sc.nextLine());
+            if (inputYear >= 1900 && inputYear <= 2999) {
+                t.setYear(inputYear);
+            } else {
+                System.out.println("Yaer was outside the valid range (1900 - 2999)");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Input for year was not a number");
+        }
+
+        System.out.print("Writer's name: ");
+
+        String inputWriter = sc.nextLine();
+        t.setWriter(new Artist(inputWriter));
 
 
-		};// end of array
+        System.out.print("Performer's name: ");
 
-		void display() {
-			for (MenuItem m : menu) {
-				System.out.println(m);
-			}
-		}
+        String inputPerformer = sc.nextLine();
+        t.setPerformer(new Artist(inputPerformer));
 
-		public boolean execute(int input) {
-			for (MenuItem m : menu) {
-				if (m != null && m.id == input) {
-					m.execute();
-					return true;
-				}
-			}
-			return false;
+        db.add(t);
 
-		}
+        System.out.println("Track was successfully added");
+    }
 
-	}
+    public void edit() {
+        if (db.size() == 0) {
+            System.out.print("no records stored.\n");
+            return;
+        }
+        if (db.selection().length == 0) {
+            System.out.print("selection empty.\n");
+            return;
+        }
 
-	public void go() {
+        String text = "entry with the index 0";
+        if (db.selection().length > 1) {
+            text = "an entry in the index range from 0 to " + (db.selection().length - 1);
+        }
+        System.out.println("Select " + text);
+        display(db);
+        Scanner sc = new Scanner(System.in);
 
-		System.out.println(WELCOME_TEXT);
-		Scanner sc = new Scanner(System.in);
-		menu.execute(0);
-		while (true) {
-			try {
-				// get choice
-				System.out.print(": ");
-				int input = Integer.parseInt(sc.nextLine());
-				if (menu.execute(input))
-					continue;
-
-				System.out.print("exit? (1=yes)");
-				if (Integer.parseInt(sc.nextLine()) == 1)
-					break;
-			}catch (NumberFormatException e){
-				System.out.println("Please input a number from the menu");
-			}
-		}
-
-		System.out.println(GOOD_BYE_TEXT);
-		sc.close();
-	}
-
-	public static void main(String[] args) {
-
-		new MainProvided().go();
-
-	}
-
-	public void display(MyTrackContainer db) {
-
-		if (db.size() == 0) {
-			System.out.print("no records stored.\n");
-			return;
-		}
-		if (db.selection().length == 0) {
-			System.out.print("selection empty.\n");
-			return;
-		}
-
-		System.out.println('\n' + theFormat.header());
-		System.out.println(theFormat.topSeparator());
-		for (Track tt : db.selection())
-			System.out.println(theFormat.format(tt));
-		System.out.println();
-
-		System.out.printf("%d out of %d records selected\n", db.selection().length,
-				db.size());
-	}
-
-	public void add(){
-		Track t = new Track();
-
-		Scanner sc = new Scanner(System.in);
-
-		System.out.print("Title: ");
-
-		String inputTitle = sc.nextLine();
-
-		if(!inputTitle.trim().isEmpty()){
-			t.setTitle(inputTitle);
-		}
-
-		System.out.print("Duration: ");
-
-		try{
-			int inputDuration = Integer.parseInt(sc.nextLine());
-			if(inputDuration >= 0){
-				t.setDuration(inputDuration);
-			} else {
-				System.out.println("Duration was negative");
-			}
-		} catch (NumberFormatException e){
-			System.out.println("Input for duration was not a number");
-		}
-
-		System.out.print("Year: ");
-
-		try{
-			int inputYear = Integer.parseInt(sc.nextLine());
-			if(inputYear >= 1900 && inputYear <= 2999){
-				t.setYear(inputYear);
-			} else {
-				System.out.println("Yaer was outside the valid range (1900 - 2999)");
-			}
-		} catch (NumberFormatException e){
-			System.out.println("Input for year was not a number");
-		}
-
-		System.out.print("Writer's name: ");
-
-		String inputWriter = sc.nextLine();
-		t.setWriter(new Artist(inputWriter));
-
-
-		System.out.print("Performer's name: ");
-
-		String inputPerformer = sc.nextLine();
-		t.setPerformer(new Artist(inputPerformer));
-
-		db.add(t);
-
-		System.out.println("Track was successfully added");
-	}
-
-	public void edit(){
-		if (db.size() == 0) {
-			System.out.print("no records stored.\n");
-			return;
-		}
-		if (db.selection().length == 0) {
-			System.out.print("selection empty.\n");
-			return;
-		}
-
-		String text = "entry with the index 0";
-		if(db.selection().length > 1){
-			 text = "an entry in the index range from 0 to " + (db.selection().length-1);
-		}
-		System.out.println("Select " + text);
-		display(db);
-		Scanner sc = new Scanner(System.in);
-
-		try{
-			int idx = Integer.parseInt(sc.nextLine());
-			if(idx >= 0 && idx <= db.selection().length-1){
-				Track t = db.selection()[idx];
-				t.scan();
-			}
-		} catch (NumberFormatException e){
-			System.out.println("Input for duration was not a number");
-		}
-	}
+        try {
+            int idx = Integer.parseInt(sc.nextLine());
+            if (idx >= 0 && idx <= db.selection().length - 1) {
+                Track t = db.selection()[idx];
+                t.scan();
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Input for duration was not a number");
+        }
+    }
 }
