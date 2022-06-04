@@ -1,15 +1,30 @@
 package MusicLandscape.application;
 
 import MusicLandscape.container.MyTrackContainer;
+import MusicLandscape.entities.Artist;
 import MusicLandscape.entities.Track;
 import MusicLandscape.util.MyFormatter;
 import MusicLandscape.util.MyMatcher;
+import MusicLandscape.util.formatters.XMLFormatter;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+    public static void main(String[] args) {
+        Track t = new Track();
+        t.setPerformer(new Artist("Peter"));
+        t.setWriter(new Artist("Peterder2"));
+        t.setDuration(1800);
+        t.setYear(2022);
+        t.setTitle("The best song ever");
+
+        XMLFormatter xml = new XMLFormatter();
+        System.out.println(xml.toString());
+        System.out.println(xml.format(t));
+    }
+
     /*private boolean asc;
     private List<Comparator<Track>> comparators;
     private MyTrackContainer db;

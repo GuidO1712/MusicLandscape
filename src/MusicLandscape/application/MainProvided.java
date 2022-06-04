@@ -8,10 +8,7 @@
 package MusicLandscape.application;
 
 import java.io.*;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 import MusicLandscape.container.MyTrackContainer;
 import MusicLandscape.entities.Artist;
@@ -26,6 +23,7 @@ import MusicLandscape.util.comparators.YearComparator;
 import MusicLandscape.util.formatters.CSVTrackFormatter;
 import MusicLandscape.util.formatters.LongTrackFormatter;
 import MusicLandscape.util.formatters.ShortTrackFormatter;
+import MusicLandscape.util.formatters.XMLFormatter;
 import MusicLandscape.util.io.MyTrackCSVReader;
 import MusicLandscape.util.io.MyWriter;
 import MusicLandscape.util.matcher.*;
@@ -67,7 +65,7 @@ public class MainProvided {
         formatters.add(theFormat = new LongTrackFormatter());
         formatters.add(new ShortTrackFormatter());
         formatters.add(new CSVTrackFormatter());
-
+        formatters.add(new XMLFormatter());
     }
 
     private static final String WELCOME_TEXT = "Welcome to the FinalTrackDataBase";
@@ -162,7 +160,7 @@ public class MainProvided {
 
                 new MenuItem("remove selection") {
                     void execute() {
-                        System.out.printf("edit:\n");
+                        System.out.printf("remove selection:\n");
                         db.remove();
                     }
                     // end of MenuItem
@@ -380,7 +378,28 @@ public class MainProvided {
                         }
                     }
                     // end of MenuItem
-                }
+                },
+
+				new MenuItem("show all artists"){
+					void execute(){
+						ArrayList<String> artistList = new ArrayList<>();
+						for(Track t : db.selection()){
+							if(t.getWriter() != null && !artistList.contains(t.getWriter().getName())){
+								artistList.add(t.getWriter().getName());
+							}
+
+							if(t.getPerformer() != null && !artistList.contains(t.getPerformer().getName())){
+								artistList.add(t.getPerformer().getName());
+							}
+						}
+
+						for(String artistName : artistList){
+							System.out.println(artistName);
+						}
+
+						System.out.println("Total number of artists: " + artistList.size());
+					}
+				}
         };// end of array
 
         void display() {

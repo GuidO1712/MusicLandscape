@@ -37,7 +37,11 @@ public class CSVTrackFormatter implements MyFormatter<Track> {
 
     @Override
     public String topSeparator() {
-        return "";
+        String text = "";
+        for(int i = 0; i < header().length(); i++){
+            text += "-";
+        }
+        return text;
     }
 
     @Override
