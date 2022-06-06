@@ -10,7 +10,7 @@ public class XMLFormatter implements MyFormatter<Track> {
 
     @Override
     public String header() {
-        return "<track><title></title><writer><name></name></writer><performer><name></name</performer><duration></duration><year></year></track>";
+        return "<track><title></title><writer><name></name></writer><performer><name></name></performer><duration></duration><year></year></track>";
     }
 
     @Override
